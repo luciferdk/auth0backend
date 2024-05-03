@@ -17,9 +17,10 @@ const express_1 = __importDefault(require("express"));
 const prisma = new client_1.PrismaClient();
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
+//user Signup endPoint
 app.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { username, password, email } = req.body;
+        const { username, password, email, firstName, lastName } = req.body;
         // Check if the user already exists
         const existingUser = yield prisma.user.findUnique({
             where: {
@@ -35,9 +36,35 @@ app.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 username,
                 password,
                 email,
+                firstName,
+                lastName,
             },
         });
         res.json(newUser);
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}));
+//user Login endPoint
+app.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { username, password } = req.body;
+        // Check if the user exists
+        const existingUser = yield prisma.user.findUnique({
+            where: {
+                username,
+            },
+        });
+        if (!existingUser) {
+            return res.status(400).json({ error: 'Invalid username or password' });
+        }
+        // Check if the password is correct
+        if (existingUser.password !== password) {
+            return res.status(400).json({ error: 'Invalid username or password' });
+        }
+        res.json({ message: 'Login successful' });
     }
     catch (error) {
         console.error(error);

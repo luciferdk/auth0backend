@@ -9,7 +9,7 @@ app.use(express.json())
 //user Signup endPoint
 app.post('/signup', async (req: Request, res: Response) => {
   try {
-    const { username, password, email } = req.body
+    const { username, password, email, firstName, lastName } = req.body
 
     // Check if the user already exists
     const existingUser = await prisma.user.findUnique({
@@ -28,6 +28,8 @@ app.post('/signup', async (req: Request, res: Response) => {
         username,
         password,
         email,
+        firstName,
+        lastName,
       },
     })
 
