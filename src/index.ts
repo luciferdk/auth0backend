@@ -1,5 +1,7 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import express, { Request, Response } from 'express'
+import bcrypt from 'bcryptjs';
+
 
 const prisma = new PrismaClient()
 const app = express()
@@ -11,6 +13,7 @@ app.post('/signup', async (req: Request, res: Response) => {
   try {
     const { username, password, email, firstName, lastName } = req.body
 
+    const hashedPassword = await bcrypt.hash(password, 10);
     // Check if the user already exists
     const existingUser = await prisma.user.findUnique({
       where: {
@@ -26,7 +29,7 @@ app.post('/signup', async (req: Request, res: Response) => {
     const newUser = await prisma.user.create({
       data: {
         username,
-        password,
+        password: hashedPassword,
         email,
         firstName,
         lastName,
@@ -57,7 +60,7 @@ app.post('/login', async (req: Request, res: Response) => {
     }
 
     // Check if the password is correct
-    if (existingUser.password !== password) {
+    if (!(await bcrypt.compare(password, existingUser.password))) {
       return res.status(400).json({ error: 'Invalid username or password' })
     }
 

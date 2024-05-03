@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const express_1 = __importDefault(require("express"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const prisma = new client_1.PrismaClient();
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
@@ -21,6 +22,7 @@ app.use(express_1.default.json());
 app.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { username, password, email, firstName, lastName } = req.body;
+        const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
         // Check if the user already exists
         const existingUser = yield prisma.user.findUnique({
             where: {
@@ -34,7 +36,7 @@ app.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const newUser = yield prisma.user.create({
             data: {
                 username,
-                password,
+                password: hashedPassword,
                 email,
                 firstName,
                 lastName,
@@ -61,7 +63,7 @@ app.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             return res.status(400).json({ error: 'Invalid username or password' });
         }
         // Check if the password is correct
-        if (existingUser.password !== password) {
+        if (!(yield bcryptjs_1.default.compare(password, existingUser.password))) {
             return res.status(400).json({ error: 'Invalid username or password' });
         }
         res.json({ message: 'Login successful' });
