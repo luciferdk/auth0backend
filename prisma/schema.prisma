@@ -21,3 +21,12 @@ model User {
   firstName  String?
   lastName   String?
 }
+
+model Worker {
+  id         Int      @id @default(autoincrement())
+  email     String  @unique
+  username   String   @unique
+  password   String
+  firstName  String?
+  lastName   String?
+}

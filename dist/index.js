@@ -73,6 +73,7 @@ app.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(500).json({ error: 'Internal server error' });
     }
 }));
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+const Port = 8080;
+app.listen(Port, () => {
+    console.log(`Server is running on port\t ${Port}`);
 });
