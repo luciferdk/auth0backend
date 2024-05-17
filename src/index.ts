@@ -77,7 +77,9 @@ app.post('/user/login', async (req: Request, res: Response) => {
     console.error(error)
     res.status(500).json({ error: 'Internal server error' })
   }
-})
+});
+
+
 
 //worker Signup endPoint
 app.post('/worker/signup', async (req: Request, res: Response) => {
