@@ -1,6 +1,6 @@
 # Don't forgot to add top of .env file and database string before you run this code </br>
 
-# To save typeScript locally npm install Typescript --save-dev </br>
+# To save typeScript dependency locally // npm install Typescript --save-dev </br>
 npx prisma migrate dev --name [contentAdded] </br>
 for run this code first use  </br>
 install prisma, pg, express, typescript, node-module, body-pase </br>
