@@ -3,16 +3,92 @@ import express, { Request, Response } from 'express'
 import bodyParser from "body-parser";
 import cors from "cors";
 import bcrypt from 'bcryptjs';
+// const jsonStringify = require('safe-json-stringify');
 
 
 const prisma = new PrismaClient()
 const app = express()
-
+const Port: number = 8080;
 
 app.use(bodyParser.json());
 app.use(cors());
-
 app.use(express.json())
+
+
+//user User data store endPoint
+// Create a new user
+app.post('/createUser', async (req, res) => {
+  try {
+    const { fullName, phoneNumber, message, date, time } = req.body;
+
+    const user = await prisma.customer.create({
+      data: {
+        fullName,
+        phoneNumber,
+        message,
+        date,
+        time
+      },
+    });
+    res.status(201).json(user);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create user' });
+  }
+});
+
+// New endpoint to fetch one users details
+app.get('/showUser/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await prisma.customer.findUnique({
+      where: {
+        id: Number(id), // Assuming id is a number, convert it to number
+      },
+    });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch user' });
+  }
+});
+
+// New endpoint to fetch all users
+app.get('/showAllUser', async (req, res) => {
+  try {
+    const users = await prisma.customer.findMany();
+    res.json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
+/* // Update an existing user
+app.put('/updateUser/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { date, time } = req.body;
+
+    const updatedUser = await prisma.customer.update({
+      where: {
+        id: parseInt(id), // Assuming id is a number, convert to number
+      },
+      data: {
+
+      },
+    });
+    res.status(200).json(updatedUser);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+}); */
 
 
 
@@ -145,7 +221,7 @@ app.post('/worker/login', async (req: Request, res: Response) => {
 })
 
 
-const Port:number = 8080
+
 app.listen(Port, () => {
   console.log(`Server is running on port\t ${Port}`)
 })
